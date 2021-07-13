@@ -15,7 +15,6 @@ app.use(index);
 
 const server = http.createServer(app);
 const io = socketIo(server); // < Interesting!
-let interval;
 
 const bik = client('wss://ws.citybik.es', {
   path: '/socket.io'
@@ -23,8 +22,8 @@ const bik = client('wss://ws.citybik.es', {
 
 io.on("connection", socket => {
   bik.on('diff', (value) => {
-    if (value.message.network === 'citi-bike-nyc') {
-      //socket.emit('diff', value.message.station);
+    if (value.message.network === 'decobike-miami-beach') {
+      socket.emit('diff', value.message.station);
     }
   });
 
@@ -36,8 +35,7 @@ io.on("connection", socket => {
   
   socket.on("conected", () => {
     axios.get(citybikeurl).then((res) => {
-      socket.emit('diff', res.data.network.stations);
-      
+      socket.emit('init', res.data.network);
     });
   });
 });
